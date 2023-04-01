@@ -1,6 +1,6 @@
 import { User } from "../models/user.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken"
+import { sendCookie } from "../utils/features.js";
 
 export const getAllUsers = async (req, res) => {
     const users = await User.find({});
@@ -27,16 +27,8 @@ export const register = async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   user = await User.create({ name, email, password: hashedPassword });
-
-  const token = jwt.sign({ _id:user._id },process.env.JWT_SECRET);
+  sendCookie(user,res,"Registered Successfully",201)
   
-  res.status(201).cookie("token",token,{
-    httpOnly:true,
-    maxAge: 15 * 60 * 1000
-  }).json({
-    success: true,
-    message: "Registerd Successfully"
-  })
   }
 
   export const getUserDetails = async (req, res) => {

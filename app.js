@@ -9,7 +9,7 @@ config({
 //Using Middlewares
 app.use(express.json());
 //using routes
-app.use("/users",userRouter);
+app.use("/api/v1/users",userRouter);
 
 app.get("/", (req, res) => {
   res.send("Working");
