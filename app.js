@@ -8,6 +8,7 @@ config({
 })
 //Using Middlewares
 app.use(express.json());
+//using routes
 app.use("/users",userRouter);
 
 app.get("/", (req, res) => {
