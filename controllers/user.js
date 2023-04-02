@@ -4,13 +4,17 @@ import { sendCookie } from "../utils/features.js";
 import ErrorHandler from "../middlewares/error.js";
 
 export const getAllUsers = async (req, res) => {
-  const users = await User.find({});
-  const keyword = req.query.keyword;
-  console.log(keyword);
-  res.json({
-    success: true,
-    users,
-  });
+  try {
+    const users = await User.find({});
+    const keyword = req.query.keyword;
+    console.log(keyword);
+    res.json({
+      success: true,
+      users,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const login = async (req, res, next) => {
@@ -25,6 +29,7 @@ export const login = async (req, res, next) => {
 
     if (!isMatch)
       return next(new ErrorHandler("Invalid Email or Password", 400));
+
     sendCookie(user, res, `Welcome back, ${user.name}`, 200);
   } catch (error) {
     next(error);
@@ -32,20 +37,21 @@ export const login = async (req, res, next) => {
 };
 
 export const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  try {
+    const { name, email, password } = req.body;
 
-  let user = await User.findOne({ email });
+    let user = await User.findOne({ email });
 
-  if (user)
-    return res.status(404).json({
-      success: false,
-      message: "User Already Exist",
-    });
+    if (user) return next(new ErrorHandler("User Already Exist", 400));
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-  user = await User.create({ name, email, password: hashedPassword });
-  sendCookie(user, res, "Registered Successfully", 201);
+    user = await User.create({ name, email, password: hashedPassword });
+
+    sendCookie(user, res, "Registered Successfully", 201);
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const getMyProfile = (req, res) => {
@@ -60,6 +66,8 @@ export const logout = (req, res) => {
     .status(200)
     .cookie("token", "", {
       expires: new Date(Date.now()),
+      sameSite: process.env.NODE_ENV === "Develpoment" ? "lax" : "none",
+      secure: process.env.NODE_ENV === "Develpoment" ? false : true,
     })
     .json({
       success: true,

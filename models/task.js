@@ -7,16 +7,16 @@ const schema = new mongoose.Schema({
   },
   description: {
     type: String,
-    unique: true,
+    required: true,
   },
   isCompleted: {
     type: Boolean,
     default: false,
   },
-  user:{
+  user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref:"User",
-    required:true,
+    ref: "User",
+    required: true,
   },
   createdAt: {
     type: Date,
