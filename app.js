@@ -23,8 +23,6 @@ app.use(
   })
 );
 
-app.use(cors());
-
 // Using routes
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/task", taskRouter);
